@@ -1,0 +1,199 @@
+-- Utility function for error handling
+local function handleError(func, ...)
+    local success, result = pcall(func, ...)
+    if not success then
+        warn("Error occurred: " .. tostring(result))
+    end
+end
+
+-- Create the GUI
+local function createGUI()
+    local screenGui = Instance.new("ScreenGui")
+    screenGui.Name = "LagSwitchGUI"
+    screenGui.Parent = game.Players.LocalPlayer.PlayerGui
+
+    local mainFrame = Instance.new("Frame")
+    mainFrame.Size = UDim2.new(0, 400, 1, 0)
+    mainFrame.Position = UDim2.new(1, -400, 0, 0)
+    mainFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    mainFrame.BackgroundTransparency = 0.5
+    mainFrame.Parent = screenGui
+
+    local title = Instance.new("TextLabel")
+    title.Size = UDim2.new(1, 0, 0, 50)
+    title.BackgroundTransparency = 1
+    title.Text = "XZ'S FE LAGGER MADE BY MIS7AKE & RUX0_0"
+    title.TextColor3 = Color3.fromRGB(255, 165, 0)
+    title.TextScaled = true
+    title.Parent = mainFrame
+
+    local crashAllButton = Instance.new("TextButton")
+    crashAllButton.Size = UDim2.new(1, 0, 0, 50)
+    crashAllButton.Position = UDim2.new(0, 0, 0.1, 0)
+    crashAllButton.Text = "Crash All"
+    crashAllButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    crashAllButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    crashAllButton.Parent = mainFrame
+
+    local crashRandomButton = Instance.new("TextButton")
+    crashRandomButton.Size = UDim2.new(1, 0, 0, 50)
+    crashRandomButton.Position = UDim2.new(0, 0, 0.2, 0)
+    crashRandomButton.Text = "Crash Random"
+    crashRandomButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    crashRandomButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    crashRandomButton.Parent = mainFrame
+
+    local lagGameButton = Instance.new("TextButton")
+    lagGameButton.Size = UDim2.new(1, 0, 0, 50)
+    lagGameButton.Position = UDim2.new(0, 0, 0.3, 0)
+    lagGameButton.Text = "Lag the Game"
+    lagGameButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+    lagGameButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+    lagGameButton.Parent = mainFrame
+
+    -- Side GUI for Chat Logger
+    local chatFrame = Instance.new("Frame")
+    chatFrame.Size = UDim2.new(0, 300, 1, 0)
+    chatFrame.Position = UDim2.new(0, 0, 0, 0)
+    chatFrame.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+    chatFrame.BackgroundTransparency = 0.5
+    chatFrame.Visible = false
+    chatFrame.Parent = screenGui
+
+    local chatTitle = Instance.new("TextLabel")
+    chatTitle.Size = UDim2.new(1, 0, 0, 50)
+    chatTitle.BackgroundTransparency = 1
+    chatTitle.Text = "Chat Logger"
+    chatTitle.TextColor3 = Color3.fromRGB(255, 165, 0)
+    chatTitle.TextScaled = true
+    chatTitle.Parent = chatFrame
+
+    local chatLog = Instance.new("TextLabel")
+    chatLog.Size = UDim2.new(1, 0, 0.9, -50)
+    chatLog.Position = UDim2.new(0, 0, 0.1, 0)
+    chatLog.BackgroundTransparency = 1
+    chatLog.TextColor3 = Color3.fromRGB(255, 255, 255)
+    chatLog.TextScaled = true
+    chatLog.TextWrapped = true
+    chatLog.Text = "Logging chat messages..."
+    chatLog.Parent = chatFrame
+
+    -- Anti-Chat Logger Toggle
+    local antiChatLoggerToggle = Instance.new("TextButton")
+    antiChatLoggerToggle.Size = UDim2.new(1, 0, 0, 50)
+    antiChatLoggerToggle.Position = UDim2.new(0, 0, 0.4, 0)
+    antiChatLoggerToggle.Text = "Anti-Chat Logger (OFF)"
+    antiChatLoggerToggle.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+    antiChatLoggerToggle.TextColor3 = Color3.fromRGB(0, 0, 0)
+    antiChatLoggerToggle.Parent = mainFrame
+
+    return crashAllButton, crashRandomButton, lagGameButton, chatFrame, chatLog, antiChatLoggerToggle
+end
+
+-- Function to create lag
+local function createLag()
+    while true do
+        handleError(function()
+            local obj = Instance.new("Part")
+            obj.Size = Vector3.new(1000, 1, 1000)
+            obj.Anchored = true
+            obj.Parent = workspace
+            wait(0.1)  -- Adjust the interval to control the intensity of lag
+        end)
+    end
+end
+
+-- Function to simulate chat spam
+local function spamChat()
+    while true do
+        handleError(function()
+            local chatService = game:GetService("Chat")
+            chatService:Chat(game.Players.LocalPlayer.Character.Head, "ICE'S LAGGER FE MADE BY RUX0_0", Enum.ChatColor.Red)
+            wait(1)  -- Adjust the interval to control the frequency of spamming
+        end)
+    end
+end
+
+-- Function to log chat messages
+local function startChatLogging(chatLog, antiChatLoggerToggle)
+    local loggingEnabled = not antiChatLoggerToggle.Text:find("ON")
+    
+    local function onPlayerChatted(player, message)
+        if loggingEnabled then
+            chatLog.Text = chatLog.Text .. "\n" .. player.Name .. ": " .. message
+        end
+    end
+
+    local function toggleAntiChatLogger()
+        loggingEnabled = not loggingEnabled
+        antiChatLoggerToggle.Text = loggingEnabled and "Anti-Chat Logger (ON)" or "Anti-Chat Logger (OFF)"
+    end
+
+    antiChatLoggerToggle.MouseButton1Click:Connect(toggleAntiChatLogger)
+
+    game.Players.PlayerAdded:Connect(function(player)
+        player.Chatted:Connect(function(message)
+            handleError(onPlayerChatted, player, message)
+        end)
+    end)
+
+    for _, player in ipairs(game.Players:GetPlayers()) do
+        player.Chatted:Connect(function(message)
+            handleError(onPlayerChatted, player, message)
+        end)
+    end
+end
+
+-- Function to handle lag operations
+local function handleLagOperation(operation, chatLog, antiChatLoggerToggle)
+    if operation == "CrashAll" then
+        for _, player in ipairs(game.Players:GetPlayers()) do
+            handleError(function()
+                -- Code to cause issues for all players
+                player:Kick("Crashing all players")
+            end)
+        end
+    elseif operation == "CrashRandom" then
+        local players = game.Players:GetPlayers()
+        if #players > 0 then
+            local randomPlayer = players[math.random(1, #players)]
+            handleError(function()
+                -- Code to cause issues for a random player
+                randomPlayer:Kick("Crashing random player")
+            end)
+        end
+    elseif operation == "LagGame" then
+        handleError(createLag)
+        handleError(spamChat)
+        handleError(startChatLogging, chatLog, antiChatLoggerToggle)
+    end
+end
+
+-- Main script
+local function main()
+    local crashAllButton, crashRandomButton, lagGameButton, chatFrame, chatLog, antiChatLoggerToggle = createGUI()
+    
+    crashAllButton.MouseButton1Click:Connect(function()
+        handleError(function()
+            handleLagOperation("CrashAll")
+        end)
+    end)
+    
+    crashRandomButton.MouseButton1Click:Connect(function()
+        handleError(function()
+            handleLagOperation("CrashRandom")
+        end)
+    end)
+    
+    lagGameButton.MouseButton1Click:Connect(function()
+        chatFrame.Visible = true
+        handleError(function()
+            handleLagOperation("LagGame", chatLog, antiChatLoggerToggle)
+        end)
+    end)
+end
+
+-- Initialize the script with error handling
+xpcall(main, function(err)
+    warn("Failed to initialize script: " .. tostring(err))
+end)
